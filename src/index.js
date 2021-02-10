@@ -1,9 +1,19 @@
 // write your code here
-url = 'http://localhost:3000/spiceblends'
+const url = 'http://localhost:3000/spiceblends'
+const ingredientsUrl = 'http://localhost:3000/ingredients'
 let spiceBlends
+let allIngredients
+document.addEventListener('DOMContentLoaded',() => {
+    fetchSpiceBlends().then(console.log)
+    fetchIngredients()
+    fetchSpiceBlends().then(spiceBlends => renderOneSpiceBlend(spiceBlends[0]))
+    fetchSpiceBlends().then(allIngredients => renderIngredients())
+    // fetchSpiceBlends().then(fetchIngredients())
 
-fetchSpiceBlends().then(console.log)
-fetchSpiceBlends().then(spiceBlends => renderOneSpiceBlend(spiceBlends[0]))
+})
+
+
+// fetches //
 
 function fetchSpiceBlends() {
     return fetch(url)
@@ -19,6 +29,23 @@ function updateSpiceBlendFetcher(id, updatedObj) {
         },
         body: JSON.stringify(updatedObj),
     })
+}
+
+function addIngredientFetch(ingredientObj) {
+    fetch(ingredientsUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ingredientObj)
+    })
+}
+
+function fetchIngredients() {
+    fetch(ingredientsUrl)
+    .then(response => response.json())
+    .then(data => allIngredients = data)
+    
 }
 
 
@@ -78,12 +105,30 @@ const ingredientForm = document.querySelector('#ingredient-form')
 ingredientForm.addEventListener('submit', (e) => {
     e.preventDefault() 
     const ingredientsContainer = document.querySelector('.ingredients-container')
+    const spiceblendId = parseInt(e.target.dataset.id)
+    const name = e.target.name.value
+    const newIngredient = {name, spiceblendId}
 
-    const ingredient = document.createElement('li')
-    ingredient.innerText = e.target.name.value
+    const ingredientLi = document.createElement('li')
+    ingredientLi.innerText = e.target.name.value
     
-    ingredientsContainer.append(ingredient)
+    ingredientsContainer.append(ingredientLi)
 
     e.target.reset()
+
+    addIngredientFetch(newIngredient)
 })
+
+function renderIngredients() {
+    const ingredientsContainer = document.querySelector('.ingredients-container') 
+
+    const filteredIngredients = allIngredients.filter(ingredient => ingredient.spiceblendId == spiceBlendDetail.dataset.id)
+    filteredIngredients.forEach(ingredient => {
+        const ingredientLi = document.createElement('li')
+        ingredientLi.innerText = ingredient.name
+    
+        ingredientsContainer.append(ingredientLi)
+    });
+
+}
 
