@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded',() => {
     fetchSpiceBlends().then(console.log)
     fetchIngredients()
     fetchSpiceBlends().then(spiceBlends => renderOneSpiceBlend(spiceBlends[0]))
-    fetchSpiceBlends().then(allIngredients => renderIngredients())
+    fetchSpiceBlends().then(renderIngredients)
+    fetchSpiceBlends().then(spiceBlends => renderAllSpiceBlendImages(spiceBlends))
     // fetchSpiceBlends().then(fetchIngredients())
 
 })
@@ -131,4 +132,28 @@ function renderIngredients() {
     });
 
 }
+
+// Spice Blend Images //
+const spiceImages = document.querySelector('#spice-images')
+function renderOneSpiceBlendImage(spiceBlend) {
+    const image = document.createElement('img')
+    image.src = spiceBlend.image
+    image.alt = spiceBlend.title
+    image.dataset.id = spiceBlend.id
+
+    spiceImages.append(image)
+}
+
+function renderAllSpiceBlendImages(spiceBlends) {
+    spiceBlends.forEach(spiceBlend => renderOneSpiceBlendImage(spiceBlend))
+}
+
+spiceImages.addEventListener('click', (e) => {
+    if (e.target.tagName == 'IMG') {
+        const spiceBlend = spiceBlends.find(spiceblend => spiceblend.id == e.target.dataset.id)
+        Array.from(spiceBlendDetail.children).forEach(child => child.remove())
+        renderOneSpiceBlend(spiceBlend)
+        renderIngredients()
+    }
+})
 
